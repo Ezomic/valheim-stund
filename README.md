@@ -7,7 +7,7 @@ The time of day and the day number, on the screen.
 Valheim already has a clock, and it shows it to you in the most expensive way there is.
 
 The sun is precise. Sunrise and sunset are fixed fractions of the day, always the same, and
-every experienced player is reading them without being told to — you look at the light and
+every experienced player is reading them without being told to. You look at the light and
 you know roughly how long you have. It works well enough that a clock feels redundant right
 up until you are underground.
 
@@ -18,7 +18,7 @@ worth starting the last corridor. Is it nearly night, so going to bed now is fre
 night just start, so it is eight minutes of standing about. The information is in the game
 already. It is simply not readable at the moment it matters.
 
-*Stund* is Old Norse for an hour — a while, a point in time.
+*Stund* is Old Norse for an hour, a while, a point in time.
 
 ## What it shows
 
@@ -27,7 +27,7 @@ already. It is simply not readable at the moment it matters.
 The day number is the game's own: the same one it announces at dawn, read from the same
 place, so the clock and the message never disagree. The time is derived from the world
 clock rather than from the smoothed value the sun and the fog are drawn with, which lags by
-a couple of seconds of real time — on a twenty-minute day that is minutes of game time, and
+a couple of seconds of real time. On a twenty-minute day that is minutes of game time, and
 a clock that is minutes out at dawn is a clock people stop trusting.
 
 Midnight is 00:00 and midday is 12:00, which puts sunrise near 06:15 and sunset near 17:45.
@@ -38,7 +38,7 @@ twenty-four hours is what makes the clock agree with the sky.
 ## Where it sits
 
 Top centre by default, because it is the only part of the screen vanilla leaves empty in
-ordinary play — the health, stamina and eitr bars own the top left and the minimap owns the
+ordinary play. The health, stamina and eitr bars own the top left and the minimap owns the
 top right. The thing that will sit on top of it is a boss health bar, which is also top
 centre and is not there for long. Corner, offset and size are three lines in the config.
 
@@ -68,7 +68,16 @@ already given and draws a label. A server does not know it is there.
 
 If [Core](https://github.com/Ezomic/valheim-core) is installed, this mod registers with its
 version gate so a mismatch is reported rather than discovered later. Every setting here is
-marked as yours — a host does not get to decide where on your screen your clock sits.
+marked as yours. A host does not get to decide where on your screen your clock sits.
+
+## Bugs and ideas
+
+Both go to the site. [longhouse.thijssensoftware.nl/bugs](https://longhouse.thijssensoftware.nl/bugs)
+is for anything broken, and [longhouse.thijssensoftware.nl/ideas](https://longhouse.thijssensoftware.nl/ideas)
+is for what a mod should do next. You can vote on other people's ideas there as well.
+
+Signing in takes a Steam or Discord account. I work from that list, so the votes decide what
+I pick up next.
 
 ## Licence
 
