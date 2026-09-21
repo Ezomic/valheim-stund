@@ -8,15 +8,22 @@ using HarmonyLib;
 namespace Stund
 {
     /// <summary>
-    /// Stund. One sentence saying what the mod does, then a paragraph saying why it is
-    /// worth having - the design argument, not the feature list. That paragraph is the thing
-    /// future-you reads first.
+    /// Stund puts the time of day and the day number on the screen.
     ///
-    /// Say here whether the mod is client-side, and say it in terms of where the work
-    /// happens rather than by habit. "Client-side" means every effect is computed by the
-    /// owning client off state it already has. The moment a decision reads another player's
-    /// progress, writes a shared ZDO, or registers a prefab, it is not client-side any more
-    /// and Requirement.Everyone below is load-bearing.
+    /// The argument for it is that Valheim already has a clock and shows it to you in the
+    /// most expensive way there is. The sun is precise - sunrise and sunset are fixed
+    /// fractions of the day, and every experienced player is reading them - but reading it
+    /// means being outdoors, looking up, and having a horizon. In a mine, a crypt, a
+    /// longhouse or a fog bank you have nothing, and the decisions that actually turn on the
+    /// time are exactly the ones you make in those places: whether there is enough light
+    /// left to sail home, whether to start the last corridor, whether it is worth going to
+    /// bed. The information is in the game. It is just not readable when it matters.
+    ///
+    /// Client-side in the strict sense: every effect is computed by the owning client off
+    /// state it already has. The clock reads EnvMan and the world clock, both of which every
+    /// client is already given, and writes nothing anywhere. A player without Stund sees
+    /// exactly the game they would have seen, which is why Requirement.HostOnly below is
+    /// correct rather than merely permissive.
     ///
     /// There is deliberately no BepInProcess attribute. A dedicated server runs
     /// valheim_server.exe, and Core's gate only refuses on the server side of RPC_PeerInfo -
@@ -106,25 +113,29 @@ namespace Stund
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void RegisterWithCore()
         {
-            // Requirement.Everyone or Requirement.HostOnly, and the choice is not a matter of
-            // taste. Everyone for anything that registers a prefab or changes item data,
-            // whether it looks networked or not: a client that cannot resolve a prefab hash
-            // does not fail loudly, ZNetScene discards the ZDO as junk and the thing a player
-            // built is simply gone. HostOnly only when a client without the mod is genuinely
-            // unaffected.
-            Suite.Register(PluginGuid, PluginName, PluginVersion, Config, Requirement.Everyone);
+            // HostOnly, and it is the whole of what this mod asks of a server: nothing. It
+            // registers no prefab, writes no ZDO and changes no item, so a client without it
+            // is genuinely unaffected and a client with it is not carrying anything the other
+            // end has to understand. Core honours that in both directions - a server running
+            // Stund lets in a client without it, and a server without Stund lets in a client
+            // that has it, which is the half that had to be fixed for Skaft.
+            Suite.Register(PluginGuid, PluginName, PluginVersion, Config, Requirement.HostOnly);
 
-            // Registering already absorbs the whole config file, so this is a formality now.
-            // It is still worth writing: naming an entry here is saying out loud that the
-            // host decides it. Keybinds are excluded by Core itself - a host taking away
-            // someone's keys for the evening is the kind of sync that gets a mod uninstalled.
-            Suite.Sync(StundConfig.Enabled);
-
-            // If the mod reads a data file that decides what it does, hash it too. The gate
-            // catches two ends on different builds; it cannot catch two ends running the
-            // same build over different text unless it is told.
-            //
-            //     Suite.Data(File.ReadAllText(path));
+            // Every entry is Local, and that is not caution - Register absorbs the whole file
+            // and the host's values are imposed on anything left synced, which for this mod
+            // would mean a server deciding where on your screen your clock sits and how big
+            // the text is. Vaettir paid for that lesson with a grid angle that turned in
+            // singleplayer and refused to turn online: Core's SettingChanged watch puts an
+            // imposed value straight back the moment anything writes it.
+            Suite.Local(
+                StundConfig.Enabled,
+                StundConfig.Where,
+                StundConfig.OffsetX,
+                StundConfig.OffsetY,
+                StundConfig.FontSize,
+                StundConfig.ShowDay,
+                StundConfig.TwentyFourHour,
+                StundConfig.Verbose);
         }
 
         private void OnDestroy()
