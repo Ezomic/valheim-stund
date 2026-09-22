@@ -85,6 +85,18 @@ namespace Stund
 
             Strip(go);
 
+            // Said out loud rather than fixed in silence. Place() now resets the rotation, so
+            // this never shows as a broken clock again - but a donor that is not upright is a
+            // fact about the vanilla HUD worth having in the log the next time something
+            // cloned from it comes out at an angle.
+            Vector3 donorAngles = donor.transform.localEulerAngles;
+            if (donorAngles.sqrMagnitude > 0.01f)
+            {
+                StundPlugin.Log.LogInfo(
+                    "The health readout is not upright - local rotation " + donorAngles
+                    + ". The clock resets its own, so this costs nothing here.");
+            }
+
             go.SetActive(true);
             _label.text = "";
             _label.raycastTarget = false;
@@ -270,6 +282,18 @@ namespace Stund
             rect.pivot = anchor;
             rect.sizeDelta = new Vector2(320f, size * 2f);
             rect.anchoredPosition = new Vector2(x, y);
+
+            // Rotation and scale are both reset, and the rotation is the one that was missing.
+            // Instantiate(donor, parent) keeps the donor's LOCAL transform, so a clone starts
+            // out wearing whatever the health readout's own transform was doing - and in 1.0
+            // that is a local rotation of (0, 0, 270), measured from the running game rather
+            // than assumed. The clock came out reading top to bottom with every glyph on its
+            // side, which looks like a font or a layout bug and is neither.
+            //
+            // A cloned HUD object owns nothing about its own placement until this code sets
+            // it, which is the same reason localScale is here: the label has to be told every
+            // part of where it is, not just the parts that looked wrong at the time.
+            rect.localRotation = Quaternion.identity;
             rect.localScale = Vector3.one;
 
             _label.alignment = alignment;
