@@ -7,8 +7,8 @@
 # What it cannot cover, so that a pass is not read as more than it is:
 #
 #   - that the label is VISIBLE. Hud hides itself by moving its root off the screen rather
-#     than by disabling it, so `onscreen` can say a label is active and never that it is in
-#     front of you.
+#     than by disabling it, so `onscreen` and `upright` can both say a label is active and
+#     neither can say it is in front of you.
 #   - the HUD toggle, because a scenario cannot press a key.
 #   - the once-per-world rebuild, because the scene a scenario runs in does not survive a load.
 
@@ -32,3 +32,13 @@ onscreen Day yes
 # clock that says 12 here is using the sun, and one that says 14 is using the bed.
 onscreen 12: yes
 onscreen 14: no
+
+# Readable, not merely present. This is a separate assertion from the three above and it is
+# here because all three passed while the clock was unreadable: it shipped reading top to
+# bottom with every glyph on its side, and a string is the same string at any angle.
+#
+# The cause is worth knowing before changing anything that builds the label. The clock is a
+# clone of the health readout, taken for its font, and Instantiate(donor, parent) keeps the
+# donor's LOCAL transform - vanilla's health readout sits at (0, 0, 270). Clock.Place() resets
+# the rotation, and this line is what says so out loud.
+upright Day
