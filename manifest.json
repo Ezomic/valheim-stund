@@ -1,7 +1,7 @@
 {
     "name":  "Stund",
     "author":  "Robbin Thijssen",
-    "version_number":  "0.1.0",
+    "version_number":  "1.0.0",
     "description":  "The time of day and the day number, on screen.",
     "dependencies":  [
                          "denikson-BepInExPack_Valheim-5.4.2350"
