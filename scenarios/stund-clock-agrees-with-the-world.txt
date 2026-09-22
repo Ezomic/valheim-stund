@@ -1,0 +1,34 @@
+# Stund - the clock is on the HUD and it reads the same time the world is at.
+#
+# Run this in SINGLEPLAYER. The time steps go through ServerBridge, and moving the clock is
+# the server's to do: on a guest they ask and may be refused, which would fail this file for
+# a reason that is nothing to do with the mod.
+#
+# What it cannot cover, so that a pass is not read as more than it is:
+#
+#   - that the label is VISIBLE. Hud hides itself by moving its root off the screen rather
+#     than by disabling it, so `onscreen` can say a label is active and never that it is in
+#     front of you.
+#   - the HUD toggle, because a scenario cannot press a key.
+#   - the once-per-world rebuild, because the scene a scenario runs in does not survive a load.
+
+clear
+god
+
+# Noon exactly. Devkit's own SkipToMidday puts the day fraction at 0.5 and says why in its
+# comment - day runs 0.25 to 0.75 and afternoon begins at 0.5 - read off EnvMan.CalculateDay.
+# Stund derives its hours from the same fraction by a different route, so this is two readings
+# of one fact rather than the mod marking its own homework.
+daytime midday
+wait 2
+
+# The day number, which Stund takes from EnvMan.GetDay - the same call the game's own dawn
+# message uses, so the two can never disagree.
+onscreen Day yes
+
+# The discriminator, and the reason this file exists at all. Midnight is fraction 0 and noon
+# is 0.5, so noon reads 12. The tempting alternative anchor is GetMorningStartSec, which is
+# 0.15 of the day: anchor on that as if it were 06:00 and this same moment reads 14:24. So a
+# clock that says 12 here is using the sun, and one that says 14 is using the bed.
+onscreen 12: yes
+onscreen 14: no
