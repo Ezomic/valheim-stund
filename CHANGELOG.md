@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+The clock can say less, or say it in a word (LHM-51). A new `Content` setting replaces `ShowDay`:
+`DayAndTime` as before, `TimeOnly`, `DayOnly`, or `TimeOfDay`, which shows Dawn, Day, Dusk or Night
+from the rescaled clock the digits already come from (Dawn 04:48 to 07:12, Dusk 16:48 to 19:12). A
+file with `ShowDay = false` is carried over once as `TimeOnly`. `FontSize` now has a range of 12 to 48,
+which is what the settings page steps through and what the 12 pixel floor already asked for.
+
+The clock's five settings (on or off, what it shows, 24-hour, position, size) are listed on Core's
+Settings page in the compendium, so they can be changed in game. With no Core nothing changes: the
+`.cfg` is still the way, and the call to Core is skipped. Built, not run in game.
+
 Fixed the clock running on raw world time (LHM-57). Valheim lights the sky from a rescaled day
 fraction, `EnvMan.RescaleDayFraction`, which stretches raw 0.15 to 0.85 onto 0.25 to 0.75. Stund
 showed the raw one, so the "Day N" message arrived at 03:36, the sun rose near 03:56 and set near

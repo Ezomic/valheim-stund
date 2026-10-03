@@ -133,9 +133,15 @@ namespace Stund
                 StundConfig.OffsetX,
                 StundConfig.OffsetY,
                 StundConfig.FontSize,
-                StundConfig.ShowDay,
+                StundConfig.Content,
                 StundConfig.TwentyFourHour,
                 StundConfig.Verbose);
+
+            SettingsPanel.Add(StundConfig.Enabled, "Show clock", SettingsGroup.Display, summary: "|clock off");
+            SettingsPanel.Add(StundConfig.Content, "Clock shows", SettingsGroup.Display);
+            SettingsPanel.Add(StundConfig.TwentyFourHour, "24-hour clock", SettingsGroup.Display, summary: "24-hour|12-hour");
+            SettingsPanel.Add(StundConfig.Where, "Position", SettingsGroup.Display);
+            SettingsPanel.Add(StundConfig.FontSize, "Size", SettingsGroup.Display, summary: "");
         }
 
         private void OnDestroy()

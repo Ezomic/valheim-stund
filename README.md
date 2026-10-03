@@ -39,6 +39,12 @@ game's doing and not a bug.
 The day number changes at 06:00, together with the "Day N" message, rather than at midnight where
 the game's own counter rolls, so the number on the HUD never runs ahead of the announcement.
 
+What it says is the `Content` setting: `DayAndTime` (the line above), `TimeOnly`, `DayOnly`, or
+`TimeOfDay`, which is a word read off the same rescaled clock: Dawn from 04:48 to 07:12, Day until
+16:48, Dusk until 19:12 and Night after that. These are windows round sunrise and sunset, not the game's
+own names for anything, since it has none. `Content` replaced the old `ShowDay` switch; a file that
+had `ShowDay = false` is read once as `TimeOnly`.
+
 ## Where it sits
 
 Top centre by default, because it is the only part of the screen vanilla leaves empty in
@@ -61,6 +67,9 @@ before the mod has loaded, which is the usual reason people think it is broken.
 
 The file is `BepInEx/config/ezomic.valheim.stund.cfg`. Open it in any text editor. Every
 setting has a comment above it, so the file explains itself.
+
+With [Core](https://github.com/Ezomic/valheim-core) installed, the same settings are on the Settings page
+of the compendium, which applies a change at once and writes this file for you.
 
 Note that changing a default in a new version does nothing on a machine that has already run
 the mod. BepInEx writes every entry on first run and the saved value wins.

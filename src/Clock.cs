@@ -257,7 +257,29 @@ namespace Stund
                 time = twelve + ":" + minute.ToString("00") + (hour < 12 ? " AM" : " PM");
             }
 
-            return StundConfig.ShowDay.Value ? "Day " + day + "   " + time : time;
+            switch (StundConfig.Content.Value)
+            {
+                case ClockContent.TimeOnly: return time;
+                case ClockContent.DayOnly: return "Day " + day;
+                case ClockContent.TimeOfDay: return PartOfDay(hour, minute);
+                default: return "Day " + day + "   " + time;
+            }
+        }
+
+        /// <summary>
+        /// The time as a word, from the same rescaled clock the digits come from, so a word and a
+        /// time never disagree about what the sky is doing. The sun rises at 06:00 and sets at 18:00
+        /// there, and each word is a window round those: Dawn from 04:48 to 07:12 (rescaled 0.20 to
+        /// 0.30), Dusk from 16:48 to 19:12 (0.70 to 0.80), Day between, Night the rest.
+        /// </summary>
+        internal static string PartOfDay(int hour, int minute)
+        {
+            int minutes = hour * 60 + minute;
+
+            if (minutes >= 288 && minutes < 432) return "Dawn";
+            if (minutes >= 432 && minutes < 1008) return "Day";
+            if (minutes >= 1008 && minutes < 1152) return "Dusk";
+            return "Night";
         }
 
         /// <summary>
