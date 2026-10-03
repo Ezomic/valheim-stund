@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using BepInEx.Configuration;
 
 namespace Stund
@@ -18,6 +20,18 @@ namespace Stund
     }
 
     /// <summary>
+    /// What the label says. The first is the clock as it was before this existed, so a file that
+    /// never chose has the same clock as before.
+    /// </summary>
+    internal enum ClockContent
+    {
+        DayAndTime,
+        TimeOnly,
+        DayOnly,
+        TimeOfDay
+    }
+
+    /// <summary>
     /// Everything tunable, bound in one place so the .cfg reads as a document rather than as
     /// whatever order the code happened to need things in.
     ///
@@ -35,9 +49,37 @@ namespace Stund
         internal static ConfigEntry<float> OffsetX;
         internal static ConfigEntry<float> OffsetY;
         internal static ConfigEntry<int> FontSize;
-        internal static ConfigEntry<bool> ShowDay;
+        internal static ConfigEntry<ClockContent> Content;
         internal static ConfigEntry<bool> TwentyFourHour;
         internal static ConfigEntry<bool> Verbose;
+
+        /// <summary>
+        /// What the file says before anything is bound: whether it already has a Content line, and
+        /// whether it has ShowDay turned off. Read as text because BepInEx keeps the lines it has
+        /// no entry for to itself.
+        /// </summary>
+        private static void ReadOldFile(string path, out bool chosen, out bool showDayOff)
+        {
+            chosen = false;
+            showDayOff = false;
+
+            try
+            {
+                foreach (string line in File.ReadAllLines(path))
+                {
+                    string[] pair = line.Split(new[] { '=' }, 2);
+                    if (pair.Length != 2) continue;
+
+                    string key = pair[0].Trim();
+                    if (key == "Content") chosen = true;
+                    if (key == "ShowDay" && pair[1].Trim().Equals("false", StringComparison.OrdinalIgnoreCase))
+                        showDayOff = true;
+                }
+            }
+            catch (IOException)
+            {
+            }
+        }
 
         internal static void Bind(ConfigFile cfg)
         {
@@ -67,18 +109,32 @@ namespace Stund
             // 12px is the suite's floor for readable text on this setup and 20 is comfortable
             // at 1440p. It is a size, not a scale, so it does not follow the game's UI scaling.
             FontSize = cfg.Bind("Stund", "FontSize", 20,
-                "Point size of the clock. Below about 12 it stops being readable at a glance, "
-                + "which defeats the point of it being on screen at all.");
+                new ConfigDescription(
+                    "Point size of the clock. Below about 12 it stops being readable at a glance, "
+                    + "which defeats the point of it being on screen at all. The range is wide so a "
+                    + "deliberate size, small or large, is kept rather than clamped on load.",
+                    new AcceptableValueRange<int>(8, 96)));
 
-            ShowDay = cfg.Bind("Stund", "ShowDay", true,
-                "Show the day number beside the time. It is the same number the game announces "
-                + "at dawn, so it agrees with the message rather than counting its own days.");
+            // Replaced ShowDay (LHM-51), which could say two things where the settings screen
+            // wants four. A file written before still says ShowDay = false, and that choice is
+            // carried over once, so nobody's clock grows a day number they had turned off.
+            bool chosen, hadShowDayOff;
+            ReadOldFile(cfg.ConfigFilePath, out chosen, out hadShowDayOff);
+
+            Content = cfg.Bind("Stund", "Content", ClockContent.DayAndTime,
+                "What the clock shows. DayAndTime is 'Day 43   17:45', TimeOnly is the time, DayOnly "
+                + "is 'Day 43', and TimeOfDay is a word from the rescaled clock: Dawn from 04:48 to "
+                + "07:12, Day until 16:48, Dusk until 19:12, and Night after that. The day number is "
+                + "the one the game announces at dawn, so it agrees with the message rather than "
+                + "counting its own days.");
+
+            if (hadShowDayOff && !chosen) Content.Value = ClockContent.TimeOnly;
 
             // 24-hour by default because Valheim has no AM/PM anywhere and the sun is the only
             // other clock in the game - a 17:45 sunset reads once, a 5:45 sunset reads twice.
             TwentyFourHour = cfg.Bind("Stund", "TwentyFourHour", true,
-                "Off gives 5:45 PM instead of 17:45. Sunrise is about 06:15 and sunset about "
-                + "17:45 either way.");
+                "Off gives 5:45 PM instead of 17:45. Sunrise is about 06:00 and sunset about "
+                + "18:00 either way.");
 
             // Not synced by intent - see the plugin. A diagnostic flag is personal, and a host
             // turning on someone else's logging is not a thing anybody asked for.

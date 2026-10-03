@@ -133,9 +133,27 @@ namespace Stund
                 StundConfig.OffsetX,
                 StundConfig.OffsetY,
                 StundConfig.FontSize,
-                StundConfig.ShowDay,
+                StundConfig.Content,
                 StundConfig.TwentyFourHour,
                 StundConfig.Verbose);
+
+            try { ListOnSettingsScreen(); }
+            catch (System.Exception e) { Log.LogInfo("Core has no settings screen to list on, so these settings are in the .cfg only: " + e.Message); }
+        }
+
+        /// <summary>
+        /// The settings this mod lists on Core's settings screen (LHM-51). Never inlined and called
+        /// inside a try, so an older Core that has no such screen costs the listing and nothing
+        /// else, and the JIT only meets the type on a machine that has it.
+        /// </summary>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private void ListOnSettingsScreen()
+        {
+            SettingsPanel.Add(StundConfig.Enabled, "Show clock", SettingsGroup.Display, summary: "|clock off");
+            SettingsPanel.Add(StundConfig.Content, "Clock shows", SettingsGroup.Display);
+            SettingsPanel.Add(StundConfig.TwentyFourHour, "24-hour clock", SettingsGroup.Display, summary: "24-hour|12-hour");
+            SettingsPanel.Add(StundConfig.Where, "Position", SettingsGroup.Display);
+            SettingsPanel.Add(StundConfig.FontSize, "Size", SettingsGroup.Display, summary: "");
         }
 
         private void OnDestroy()
