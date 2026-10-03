@@ -24,16 +24,20 @@ already. It is simply not readable at the moment it matters.
 
 `Day 43   17:45`, in the game's own typeface, in a corner you choose.
 
-The day number is the game's own: the same one it announces at dawn, read from the same
-place, so the clock and the message never disagree. The time is derived from the world
+The day number is the game's own count, the one it announces at dawn. The time is derived from the world
 clock rather than from the smoothed value the sun and the fog are drawn with, which lags by
 a couple of seconds of real time. On a twenty-minute day that is minutes of game time, and
 a clock that is minutes out at dawn is a clock people stop trusting.
 
-Midnight is 00:00 and midday is 12:00, which puts sunrise near 06:15 and sunset near 17:45.
-Those are not chosen numbers: Valheim's own day curve peaks at the halfway point and its two
-horizon transitions sit at 0.26 and 0.74 of the day, so mapping the day straight onto
-twenty-four hours is what makes the clock agree with the sky.
+The clock follows the sun, not the raw world time. Valheim does not light the sky from raw time:
+it squeezes the night, so the sky runs on a rescaled day, and the morning trigger, the horizon
+transitions and the lighting all read that. Stund applies the same rescaling (a copy of
+`EnvMan.RescaleDayFraction`), so sunrise and the "Day N" message are 06:00, noon is 12:00, sunset
+is 18:00 and midnight is 00:00. Night is the part that moves fastest on the clock, which is the
+game's doing and not a bug.
+
+The day number changes at 06:00, together with the "Day N" message, rather than at midnight where
+the game's own counter rolls, so the number on the HUD never runs ahead of the announcement.
 
 ## Where it sits
 

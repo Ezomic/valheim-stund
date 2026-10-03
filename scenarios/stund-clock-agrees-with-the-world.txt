@@ -15,23 +15,47 @@
 clear
 god
 
+# The morning trigger, first, and through the game's own skip rather than a written time: this
+# is the step that fails if the game moves the point its "Day N" message fires at. SkipToMorning
+# lands on GetMorningStartSec, raw 0.15 of the day, which the game's rescaling maps to 0.25 -
+# the morning trigger. The clock must call that 06:00. The raw clock called it 03:36, so
+# `03:` is the old reading and is refused outright (LHM-57). The skip takes about twelve
+# seconds on a host, so 14 is waited, and the clock has run on a couple of game minutes since.
+daytime morning
+wait 14
+onscreen 06: yes
+onscreen 03: no
+onscreen Day yes
+
 # Noon exactly. Devkit's own SkipToMidday puts the day fraction at 0.5 and says why in its
 # comment - day runs 0.25 to 0.75 and afternoon begins at 0.5 - read off EnvMan.CalculateDay.
-# Stund derives its hours from the same fraction by a different route, so this is two readings
-# of one fact rather than the mod marking its own homework.
+# Noon is the one hour raw and rescaled time agree on, which is why this file used to pass
+# while the rest of the clock was wrong. Stund derives its hours by a different route, so
+# this is two readings of one fact rather than the mod marking its own homework.
 daytime midday
 wait 2
 
-# The day number, which Stund takes from EnvMan.GetDay - the same call the game's own dawn
-# message uses, so the two can never disagree.
-onscreen Day yes
-
-# The discriminator, and the reason this file exists at all. Midnight is fraction 0 and noon
-# is 0.5, so noon reads 12. The tempting alternative anchor is GetMorningStartSec, which is
-# 0.15 of the day: anchor on that as if it were 06:00 and this same moment reads 14:24. So a
-# clock that says 12 here is using the sun, and one that says 14 is using the bed.
+# The discriminator for the anchor. The tempting alternative is GetMorningStartSec, 0.15 of
+# the day: anchor on that as if it were 06:00 and this same moment reads 14:24. So a clock
+# that says 12 here is using the sun, and one that says 14 is using the bed.
 onscreen 12: yes
 onscreen 14: no
+
+# Sunset. Rescaled 0.75 is raw 0.85, which is 420 seconds on from noon on a 1200 second day
+# (the vanilla day length; a different one fails this loudly, which is the honest outcome). The
+# raw clock called this moment 20:24, so `20:` is refused.
+clock 420
+wait 2
+onscreen 18: yes
+onscreen 20: no
+
+# Midnight, raw 1.0, 180 seconds after sunset's raw 0.85. Ten seconds more are asked for than
+# the arithmetic wants, because the clock has run on through the waits and night is the part
+# of the day that moves two clock minutes per second: landing early would read 23:
+# and stop the test for a reason that is not the mod's. So this reads as shortly after 00:00.
+clock 190
+wait 2
+onscreen 00: yes
 
 # Readable, not merely present. This is a separate assertion from the three above and it is
 # here because all three passed while the clock was unreadable: it shipped reading top to
