@@ -26,6 +26,10 @@ namespace Stund
     /// Rescaled, the morning trigger and sunrise read 06:00, noon 12:00 and sunset 18:00, and
     /// midnight is still 00:00. The method is private, so <see cref="Rescale"/> is a copy.
     ///
+    /// The game's own "Day N" message is decided on the smoothed fraction, so it fires about two
+    /// real seconds after the world clock passes the morning trigger, and the HUD number, which
+    /// follows the world clock, changes that much before the message appears.
+    ///
     /// <b>The day number changes at 06:00, with the message.</b> See <see cref="TryRead"/>.
     /// </summary>
     internal static class Clock
