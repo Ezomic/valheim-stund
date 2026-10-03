@@ -5,8 +5,9 @@
 The clock can say less, or say it in a word (LHM-51). A new `Content` setting replaces `ShowDay`:
 `DayAndTime` as before, `TimeOnly`, `DayOnly`, or `TimeOfDay`, which shows Dawn, Day, Dusk or Night
 from the rescaled clock the digits already come from (Dawn 04:48 to 07:12, Dusk 16:48 to 19:12). A
-file with `ShowDay = false` is carried over once as `TimeOnly`. `FontSize` now has a range of 12 to 48,
-which is what the settings page steps through and what the 12 pixel floor already asked for.
+file with `ShowDay = false` is carried over once as `TimeOnly`. `FontSize` now has a range of 8 to 96,
+wide enough that a deliberate size, small or large, is kept instead of being clamped when the file
+is loaded; the settings page steps through the same range.
 
 The clock's five settings (on or off, what it shows, 24-hour, position, size) are listed on Core's
 Settings page in the compendium, so they can be changed in game. With no Core nothing changes: the

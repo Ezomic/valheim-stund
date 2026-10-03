@@ -111,8 +111,9 @@ namespace Stund
             FontSize = cfg.Bind("Stund", "FontSize", 20,
                 new ConfigDescription(
                     "Point size of the clock. Below about 12 it stops being readable at a glance, "
-                    + "which defeats the point of it being on screen at all.",
-                    new AcceptableValueRange<int>(12, 48)));
+                    + "which defeats the point of it being on screen at all. The range is wide so a "
+                    + "deliberate size, small or large, is kept rather than clamped on load.",
+                    new AcceptableValueRange<int>(8, 96)));
 
             // Replaced ShowDay (LHM-51), which could say two things where the settings screen
             // wants four. A file written before still says ShowDay = false, and that choice is
