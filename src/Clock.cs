@@ -6,7 +6,7 @@ namespace Stund
     /// <summary>
     /// The clock itself: the time, and the label that shows it.
     ///
-    /// Two decisions worth reading before changing anything here.
+    /// Decisions worth reading before changing anything here.
     ///
     /// <b>The time is computed from the world clock, not from EnvMan.GetDayFraction().</b>
     /// That property returns <c>m_smoothDayFraction</c>, which is lerped a hundredth of the
@@ -17,15 +17,22 @@ namespace Stund
     /// message at dawn. EnvMan derives the true fraction from <c>ZNet.GetTimeSeconds()</c>
     /// and <c>m_dayLengthSec</c> in one line, so this does the same and gets the exact number.
     ///
-    /// <b>Midnight is fraction 0, midday is 0.5.</b> Not a guess, and not the 0.15 that
-    /// <c>GetMorningStartSec</c> uses - that is where sleeping puts you, which is before
-    /// dawn, and anchoring a clock there would put noon in the afternoon. The sun is the
-    /// authority: EnvMan's day factor peaks at 0.5 and its two horizon transitions are
-    /// centred on 0.26 and 0.74, so fraction times 24 gives midday at 12:00, sunrise near
-    /// 06:15 and sunset near 17:45.
+    /// <b>The fraction is the game's RESCALED one, not raw world time.</b> The first version
+    /// mapped raw time straight onto 24 hours, on the reasoning that the sun peaks at 0.5. That
+    /// was right at noon and wrong everywhere else: EnvMan.RescaleDayFraction squeezes the
+    /// night, stretching raw 0.15 to 0.85 onto 0.25 to 0.75, and every light, the horizon
+    /// transitions at 0.26 and 0.74 and the morning trigger work on the rescaled number. So the
+    /// raw clock read 03:36 when the "Day N" message appeared and 20:04 at sunset (LHM-57).
+    /// Rescaled, the morning trigger and sunrise read 06:00, noon 12:00 and sunset 18:00, and
+    /// midnight is still 00:00. The method is private, so <see cref="Rescale"/> is a copy.
+    ///
+    /// <b>The day number changes at 06:00, with the message.</b> See <see cref="TryRead"/>.
     /// </summary>
     internal static class Clock
     {
+        /// <summary>EnvMan.GetMorningStartSec's 0.15, the raw fraction RescaleDayFraction maps to 0.25.</summary>
+        private const double MorningFraction = 0.15;
+
         private static TMP_Text _label;
 
         /// <summary>
@@ -196,16 +203,40 @@ namespace Stund
             if (length <= 0) return false;
 
             double seconds = ZNet.instance.GetTimeSeconds();
-            double fraction = seconds % length / length;
+            double fraction = Rescale(seconds % length / length);
 
             double hours = fraction * 24.0;
             hour = (int)hours;
             minute = (int)((hours - hour) * 60.0);
 
-            // The game's own day number, so this agrees with the "Day N" message at dawn
-            // rather than counting days of its own.
-            day = env.GetDay();
+            // The day number rolls at the morning trigger, 0.15 of the raw day, not at raw
+            // midnight where EnvMan.GetDay() rolls. The "Day N" message is shown at that
+            // trigger with N = total seconds over day length, which is GetDay() at that moment,
+            // so the two agree from 06:00 on. Before it GetDay() has already moved on to N while
+            // the message for N has not appeared, and a HUD reading "Day 44   03:10" is a day
+            // the game has not announced. Shifting by the same 0.15 makes the number change on
+            // the message, which is also when the clock reads 06:00.
+            day = (int)((seconds - length * MorningFraction) / length);
             return true;
+        }
+
+        /// <summary>
+        /// A copy of EnvMan.RescaleDayFraction, assembly_valheim 1.0, which is private. Copied
+        /// rather than reflected into: five lines that have not changed, against a reflection
+        /// bound to a private name that would cost the clock outright if it were renamed. The
+        /// scenario stund-clock-agrees-with-the-world is what notices if the game moves them,
+        /// because it asks the real morning skip what the clock reads.
+        /// </summary>
+        internal static double Rescale(double fraction)
+        {
+            if (fraction >= 0.15 && fraction <= 0.85)
+            {
+                return 0.25 + (fraction - 0.15) / 0.7 * 0.5;
+            }
+
+            if (fraction < 0.5) return fraction / 0.15 * 0.25;
+
+            return 0.75 + (fraction - 0.85) / 0.15 * 0.25;
         }
 
         private static string Render(int hour, int minute, int day)
