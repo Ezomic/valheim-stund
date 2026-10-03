@@ -32,7 +32,7 @@ a clock that is minutes out at dawn is a clock people stop trusting.
 The clock follows the sun, not the raw world time. Valheim does not light the sky from raw time:
 it squeezes the night, so the sky runs on a rescaled day, and the morning trigger, the horizon
 transitions and the lighting all read that. Stund applies the same rescaling (a copy of
-`EnvMan.RescaleDayFraction`), so sunrise and the "Day N" message are 06:00, noon is 12:00, sunset
+`EnvMan.RescaleDayFraction`), so the morning (the "Day N" message and the game's own morning trigger) is exactly 06:00, sunrise is about 06:00 (the horizon transition is centred a quarter-hour later), noon is 12:00, sunset
 is 18:00 and midnight is 00:00. Night is the part that moves fastest on the clock, which is the
 game's doing and not a bug.
 
