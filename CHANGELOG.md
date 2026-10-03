@@ -6,14 +6,16 @@ Fixed the clock running on raw world time (LHM-57). Valheim lights the sky from 
 fraction, `EnvMan.RescaleDayFraction`, which stretches raw 0.15 to 0.85 onto 0.25 to 0.75. Stund
 showed the raw one, so the "Day N" message arrived at 03:36, the sun rose near 03:56 and set near
 20:04. Only noon agreed, which is why the old scenario passed: it looked at nothing else. The clock
-now applies the same rescaling (a copy, since the method is private), so the morning trigger and
-sunrise read 06:00, noon 12:00, sunset 18:00 and midnight 00:00.
+now applies the same rescaling (a copy, since the method is private), so the morning trigger reads 06:00, sunrise about 06:00, noon 12:00, sunset 18:00 and midnight 00:00.
 
 The day number now changes at 06:00 with the "Day N" message, not at midnight where
 `EnvMan.GetDay()` rolls, so the HUD never shows a day the game has not announced yet.
 
 The scenario `stund-clock-agrees-with-the-world` now steps through 06:00 (the real morning skip),
-12:00, 18:00 and 00:00, and fails on the old raw readings. It assumes the 1200 second day.
+12:00, 18:00 and 00:00, and fails on the old raw readings. It assumes the 1200 second day. It does not check that the day NUMBER rolled at 06:00: Devkit
+scenarios can assert that a HUD label contains a fixed string (`onscreen`) but cannot read a
+number off it or compare two readings, and the starting day is not known, so the scenario only
+checks that a "Day" label is present.
 
 ## 1.0.0 - pending
 
