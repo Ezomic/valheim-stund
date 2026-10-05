@@ -1,23 +1,24 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 - 2026-10-05
 
-Fixed the clock running on raw world time (LHM-57). Valheim lights the sky from a rescaled day
-fraction, `EnvMan.RescaleDayFraction`, which stretches raw 0.15 to 0.85 onto 0.25 to 0.75. Stund
-showed the raw one, so the "Day N" message arrived at 03:36, the sun rose near 03:56 and set near
-20:04. Only noon agreed, which is why the old scenario passed: it looked at nothing else. The clock
-now applies the same rescaling (a copy, since the method is private), so the morning trigger reads 06:00, sunrise about 06:00, noon 12:00, sunset 18:00 and midnight 00:00.
+### Fixed
 
-The day number now changes at 06:00 with the "Day N" message, not at midnight where
-`EnvMan.GetDay()` rolls, so the HUD never shows a day the game has not announced yet.
+- **The clock now reads the sky's time, not raw world time.** Valheim lights the sky from a
+  rescaled day fraction (`EnvMan.RescaleDayFraction`) that squeezes the night, so with raw time
+  the "Day N" message arrived at 03:36, the sun rose near 03:56 and set near 20:04. Only noon
+  agreed. Stund now applies the same rescaling (a copy, since the method is private), so the
+  morning is 06:00, sunrise is about 06:00, noon is 12:00, sunset is 18:00 and midnight is 00:00.
+- The day number changes at 06:00 together with the "Day N" message, not at midnight where
+  `EnvMan.GetDay()` rolls it. The message trails the HUD by about two real seconds.
+- The cfg description of `TwentyFourHour` gave the old sunrise and sunset times.
 
-The scenario `stund-clock-agrees-with-the-world` now steps through 06:00 (the real morning skip),
-12:00, 18:00 and 00:00, and fails on the old raw readings. It assumes the 1200 second day. It does not check that the day NUMBER rolled at 06:00: Devkit
-scenarios can assert that a HUD label contains a fixed string (`onscreen`) but cannot read a
-number off it or compare two readings, and the starting day is not known, so the scenario only
-checks that a "Day" label is present.
+The scenario `stund-clock-agrees-with-the-world` now steps through 06:00, 12:00, 18:00 and 00:00,
+and fails on the old readings. It assumes the 1200 second day. It cannot check that the day
+number rolled, only that a "Day" label is present, since scenarios cannot read a number off the
+HUD.
 
-## 1.0.0 - pending
+## 1.0.0 - 2026-09-30
 
 First release.
 

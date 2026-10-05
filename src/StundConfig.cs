@@ -75,10 +75,11 @@ namespace Stund
                 + "at dawn, so it agrees with the message rather than counting its own days.");
 
             // 24-hour by default because Valheim has no AM/PM anywhere and the sun is the only
-            // other clock in the game - a 17:45 sunset reads once, a 5:45 sunset reads twice.
+            // other clock in the game - an 18:00 sunset reads once, while 6:00 PM shares
+            // its digits with the 6:00 AM sunrise and needs the suffix to be told apart.
             TwentyFourHour = cfg.Bind("Stund", "TwentyFourHour", true,
-                "Off gives 5:45 PM instead of 17:45. Sunrise is about 06:15 and sunset about "
-                + "17:45 either way.");
+                "Off gives 6:00 PM instead of 18:00. Sunrise is about 06:00 and sunset about "
+                + "18:00 either way.");
 
             // Not synced by intent - see the plugin. A diagnostic flag is personal, and a host
             // turning on someone else's logging is not a thing anybody asked for.

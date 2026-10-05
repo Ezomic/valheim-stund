@@ -39,7 +39,7 @@ namespace Stund
     {
         public const string PluginGuid = "ezomic.valheim.stund";
         public const string PluginName = "Stund";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
         public const string PluginAuthor = "Robbin Thijssen";
 
         /// <summary>Core's plugin GUID. Optional - see TryRegisterWithCore.</summary>
